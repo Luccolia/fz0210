@@ -2,6 +2,8 @@
 using Library.Modells;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Library.Controllers
 {
@@ -16,7 +18,7 @@ namespace Library.Controllers
             _context = context;
         }
 
-        
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Book>>> GetBooks(string title = null, string author = null, int page = 1, int pageSize = 10)
         {
@@ -50,14 +52,17 @@ namespace Library.Controllers
             return Ok(book);
         }
 
-        
-        [HttpPost]
-        public async Task<ActionResult<Book>> AddBook(Book book)
+        [HttpGet]
+        public ActionResult<Book> GetBookById(int id)
         {
-            _context.Books.Add(book);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetBook), new { id = book.Id }, book);
+            var book = _context.Books.Find(id);
+            if (book == null)
+            {
+                return NotFound();
+            }
+            return book;
         }
+
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateBook(int id, Book book)
